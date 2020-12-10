@@ -1,12 +1,11 @@
 import React, { useEffect, useState } from "react";
+import { useIsFocused } from '@react-navigation/native';
 import { View, Text, Button, Picker } from 'react-native';
 import { SearchBar } from 'react-native-elements';
 import { FlatList } from 'react-native-gesture-handler';
 import BoardItem from '../components/BoardItems'
 import { api } from '../api';
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { useIsFocused } from '@react-navigation/native';
-
 
 async function getBoardList(setBoards, search, selectedValue) {
   try {
@@ -31,7 +30,7 @@ const BoardListScreen = ({ navigation }) => {
 
   useEffect(() => {
     getBoardList(setBoards, search, selectedValue);
-  }, [search, selectedValue])
+  }, [search, selectedValue, isFocused])
 
   return (
     <>
