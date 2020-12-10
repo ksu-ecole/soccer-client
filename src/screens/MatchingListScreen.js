@@ -3,6 +3,7 @@ import { View, Text, Switch, Button } from 'react-native';
 import { SearchBar } from 'react-native-elements';
 import { FlatList } from 'react-native-gesture-handler';
 import MatchingItem from '../components/MatchingItem';
+import MyMatchingItem from '../components/MyMatchingItem';
 import NoMyMatchingItem from '../components/NoMyMatchingItem';
 import AllLocationItem from '../components/AllLocationItem';
 import { Avatar } from 'react-native-elements';
@@ -22,7 +23,7 @@ async function getMatchingList(setMatchings, search, location) {
       }
     }
     const res = await api.get(`/api/matches?teamName=${search}&state=${location.state}&district=${location.district}`, config);
-    console.log(`/api/matches?teamName=${search}&state=${location.state}&district=${location.district}`)
+    console.log(`/api/matches?teamName=${search}&state=${location.state}&district=${location.district}`)//
     setMatchings(res.data);
   } catch (error) {
     console.log(error)

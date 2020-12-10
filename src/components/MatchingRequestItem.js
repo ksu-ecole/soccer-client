@@ -1,61 +1,55 @@
 import React from 'react';
 import { TouchableOpacity, Text, View, Button, Alert } from 'react-native';
 import { Avatar } from 'react-native-elements';
+import { api } from '../api';
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const MatchingRequestItem = (props) => {
-  const {team_name, matching_count } = props.matchingRequest;
+  const { id } = props.matchingRequest;
+  const matchId = props.matchingRequest.match.id;
+  const name = props.matchingRequest.applyTeam.name;
+  const logopath = props.matchingRequest.applyTeam.logopath;
+  const applyTeamId = props.matchingRequest.applyTeam.id;
+  const status = props.matchingRequest.match.matchStatus;
 
-  const acceptalert = () => {
-  
-    Alert.alert(
-      "신청 수락",
-      "매칭신청을 수락하시겠습니까?",
-      [
-        {
-          text: "취소",
-          onPress: () => console.log("수락 취소"),
-          style: "cancel"
-        },
-        { text: "확인", onPress: () => console.log(team_name + "팀과의 매칭이 성사되었습니다.") }
-      ],
-      { cancelable: false }
-    );
+  async function putRequest(homeStatus, matchId, applyTeamId) {
+    try {
+      const token = await AsyncStorage.getItem("token");
+      const config = {
+        headers: {
+          Authorization: token
+        }
+      }
+      const res = await api.put(`/api/matches/${matchId}/home/${applyTeamId}`, homeStatus, config);
+      console.log("아이템 콘솔 시작")
+      console.log(res.data)
+    } catch (error) {
+      console.log(error)
+    }
   }
-  const rejectalert = () =>
-    Alert.alert(
-      "신청 거절",
-      "매칭신청을 거절하시겠습니까?",
-      [
-        {
-          text: "취소",
-          onPress: () => console.log("거절 취소"),
-          style: "cancel"
-        },
-        { text: "확인", onPress: () => console.log(team_name + "팀과의 매칭이 거절되었습니다.") }
-      ],
-      { cancelable: false }
-    );
 
   return (
-    <TouchableOpacity style={{ flexDirection: "row", alignItems: "center", margin: 5, justifyContent: "space-between"}}
-                            // onPress={() => navigation.navigate('#') }
-    >
-      
-      <View style={{ flexDirection: "row", alignItems: "center"}}>
-        <Avatar size="medium" rounded title={team_name.substring(0,1)} containerStyle={{ backgroundColor: "gray" }} />
-        <Text style={{ fontSize: 17, marginLeft: 15, fontWeight: 'bold'}}>{team_name}</Text>
-        
+    <TouchableOpacity style={{ flexDirection: "row", alignItems: "center", margin: 5, justifyContent: "space-between" }}>
+      <View style={{ flexDirection: "row", alignItems: "center" }}>
+      <Avatar size="medium" rounded source={{ uri: logopath }} containerStyle={{ backgroundColor: "gray" }} />
+        <Text style={{ fontSize: 17, marginLeft: 15, fontWeight: 'bold' }}>{name}</Text>
       </View>
-      
-      <View style={{ flexDirection: "row", alignItems: "center"}}>
-        <Text style={{ fontSize: 13, marginRight: 15}}>{matching_count}</Text>
-        <Button style={{ fontSize: 13, padding: 15}} title="수락" color="#4c75c0" onPress={acceptalert}/>
-        <Text>   </Text>
-        <Button style={{ fontSize: 13, marginRight: 15}} title="거절" color="gray" onPress={rejectalert}/>
-      </View>
-      
+
+      {
+        status !== "PROGRESSING" ?
+          <>
+            <View style={{ flexDirection: "row", alignItems: "center" }}>
+              <Button style={{ fontSize: 13, padding: 15 }} title="수락" color="#4c75c0"
+                onPress={() => { putRequest({ homeStatus: "ACCEPT" }, matchId, applyTeamId) }} />
+              <Text>   </Text>
+              <Button style={{ fontSize: 13, marginRight: 15 }} title="거절" color="gray"
+                onPress={() => { putRequest({ homeStatus: "REJECT" }, matchId, applyTeamId) }} />
+            </View>
+          </>
+          :
+          <></>
+      }
     </TouchableOpacity>
-    
   );
 };
 

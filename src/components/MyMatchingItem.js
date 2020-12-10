@@ -20,7 +20,9 @@ const MyMatchingItem = (props) => {
       <Text style={{ fontSize: 15, marginLeft: 5 }}>{state} {district}</Text>
       <Text style={{ fontSize: 15, marginLeft: 5 }}>{countMember}</Text>
 
-      <Button title="요청목록" onPress={() => navigation.navigate('MatchingRequest')} />
+      <Button title="요청목록" onPress={() => { navigation.navigate('MatchingRequest',
+        {id: id});
+        }}/>
     </TouchableOpacity>
   );
 };
