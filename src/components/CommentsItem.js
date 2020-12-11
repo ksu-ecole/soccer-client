@@ -102,14 +102,15 @@ const [modicontent, inputContent] = useState('');
         </ListItem.Content>
 
         <View style={styles.udbutton} >
-          <Button
+          
+          {/* <Button
             title="수정"
             type="outline"
             onPress={() => {
               setModalVisible(true);
             }}
           />
-          <Text>   </Text>
+          <Text>   </Text> */}
           <Button
             onPress={deleteButtonAlert}
             title="삭제"
