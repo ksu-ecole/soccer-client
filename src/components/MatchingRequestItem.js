@@ -20,6 +20,8 @@ const MatchingRequestItem = (props) => {
         }
       }
       const res = await api.put(`/api/matches/${matchId}/home/${applyTeamId}`, homeStatus, config);
+      console.log(matchId)
+      console.log(applyTeamId)
     } catch (error) {
       console.log(error)
     }
