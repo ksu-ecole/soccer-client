@@ -1,4 +1,4 @@
-//내팀이 신청한 매칭의 목록(applystatus), 신청(applyMatch), 취소(cancelMatch) 안됨
+//내팀이 신청한 매칭의 취소(cancelMatch) 안됨
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import React, { useState, useEffect } from "react";

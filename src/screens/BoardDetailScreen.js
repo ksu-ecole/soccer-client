@@ -127,7 +127,7 @@ const BoardDetailScreen = ({ route, navigation }) => {
         {
           my ?
           account ?
-            my[0].name==account.name
+            my[0].writeid==account.id
             ? 
               <>
                 {/* 게시글; 프로필사진 avatar + 이름 title + 시간 subtitle */}
