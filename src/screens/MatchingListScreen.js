@@ -24,7 +24,7 @@ async function getMatchingList(setMatchings, search, location) {
       }
     }
     const res = await api.get(`/api/matches?teamName=${search}&state=${location.state}&district=${location.district}`, config);
-    console.log(`/api/matches?teamName=${search}&state=${location.state}&district=${location.district}`)
+    console.log(`/api/matches?teamName=${search}&state=${location.state}&district=${location.district}`)//
     setMatchings(res.data);
   } catch (error) {
     console.log(error)
