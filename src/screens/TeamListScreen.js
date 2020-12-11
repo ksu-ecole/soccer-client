@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { useIsFocused } from '@react-navigation/native';
 import { View, Text, Button } from 'react-native';
 import { SearchBar } from 'react-native-elements';
 import { FlatList } from 'react-native-gesture-handler';
@@ -26,10 +27,11 @@ const TeamListScreen = ({ navigation }) => {
   const [search, setSearch] = useState('');
   const [teams, setTeams] = useState([]);
   const [location, setLocation] = useState();
+  const isFocused = useIsFocused();
 
   useEffect(() => {
     getTeamList(setTeams, search, location);
-  }, [search, location])
+  }, [search, location, isFocused])
 
   return (
     <>
