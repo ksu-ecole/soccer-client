@@ -22,6 +22,21 @@ async function getProfile(setAccount) {
   }
 }
 
+async function getMatch(setApply, id){ // matchId
+  try {
+    const token = await AsyncStorage.getItem('token');
+    const config = {
+      headers: {
+        Authorization: token
+      }
+    }
+    const res = await api.get(`/api/applications/teams/${id}`, config);
+    setApply(res.data)
+  } catch (err) {
+    console.log(err);
+  }
+}
+
 async function deleteMatch(id) {
   try {
     const token = await AsyncStorage.getItem('token');
@@ -39,49 +54,45 @@ async function deleteMatch(id) {
 //id값 팀이 매칭신청한 경기목록
 async function applystatus(data, id) { //teamId
   try {
-    const token = await AsyncStorage.getItem("token");
+    const token = await AsyncStorage.getItem('token');
     const config = {
       headers: {
         Authorization: token
       } 
     }
     const res = await api.get(`/api/applications/teams/away/${id}`, config);
-    setUserinfo(res.data); 
-    console.log("applystatus" + res.data)
-    console.log("id" + id)
+    setUserinfo(res.data);
   } catch (error) {
     console.log(error)
   }
 }
 
-async function applyMatch(setApplication, data, id) { //matchId
+async function applyMatch(setApply, data, id) { //matchId
   try {
     const token = await AsyncStorage.getItem('token');
     const config = {
       headers: {
-          Authorization: token
-      }
+        Authorization: token
+      } 
     }
     const res = await api.put(`/api/applications/teams/apply/${id}`, data, config);
-    setApplication(res.data);
+    setApply(res.data);
   } catch (err) {
     console.log(err);
   }
 }
 
+
 async function cancelMatch(applicationId) {
   try {
-    console.log("1");
     const token = await AsyncStorage.getItem('token');
-    console.log("2");
     const config = {
       headers: {
-          Authorization: token
+        Authorization: token
       }
     }
-    console.log("3");
+    console.log(config);
     const res = await api.put(`/api/applications/teams/${applicationId}/away`, config);
-    console.log("4");
   } catch (err) {
       console.log(err);
   }
@@ -90,13 +101,17 @@ async function cancelMatch(applicationId) {
 const MatchingDetailScreen = ({ route, navigation }) => {
   const { id, homeTeam_id, name, logoPath, state, district, date, countMember, description, matchStatus } = route.params; //id=matchingid
   const [account, setAccount] = useState(null);
-  const [application, setApplication] = useState();
+  const [apply, setApply] = useState(null);
 
   useEffect(() => {
     getProfile(setAccount);
   }, [])
 
-  console.log(application)
+  useEffect(() => {
+    getMatch(setApply, id);
+  }, [])
+
+  console.log(apply)
   
   const list = [
     {
@@ -157,7 +172,7 @@ const MatchingDetailScreen = ({ route, navigation }) => {
             const data = {
               awayTeamId: account.team.id
             } 
-            applyMatch(setApplication, data, id)
+            applyMatch(setApply, data, id)
           }
         }
       ],
@@ -175,9 +190,9 @@ const MatchingDetailScreen = ({ route, navigation }) => {
           style: "cancel"
         },
         { text: "확인", onPress: () => {
-          console.log("app: " + application.id)
+          console.log("app: " + apply.id)
+          cancelMatch(apply.id)
           console.log("매칭 신청 취소 완료")
-          cancelMatch(application.id)
         } 
       }
       ],

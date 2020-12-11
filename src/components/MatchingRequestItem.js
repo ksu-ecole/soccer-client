@@ -1,18 +1,17 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { TouchableOpacity, Text, View, Button, Alert } from 'react-native';
 import { Avatar } from 'react-native-elements';
 import { api } from '../api';
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const MatchingRequestItem = (props) => {
-  const { id } = props.matchingRequest;
   const matchId = props.matchingRequest.match.id;
   const name = props.matchingRequest.applyTeam.name;
   const logopath = props.matchingRequest.applyTeam.logopath;
   const applyTeamId = props.matchingRequest.applyTeam.id;
   const status = props.matchingRequest.match.matchStatus;
-
-  async function putRequest(homeStatus, matchId, applyTeamId) {
+  
+  async function putRequest(setMatch, homeStatus, matchId, applyTeamId) {
     try {
       const token = await AsyncStorage.getItem("token");
       const config = {
@@ -21,20 +20,17 @@ const MatchingRequestItem = (props) => {
         }
       }
       const res = await api.put(`/api/matches/${matchId}/home/${applyTeamId}`, homeStatus, config);
-      console.log("아이템 콘솔 시작")
-      console.log(res.data)
     } catch (error) {
       console.log(error)
     }
   }
-
   return (
     <TouchableOpacity style={{ flexDirection: "row", alignItems: "center", margin: 5, justifyContent: "space-between" }}>
       <View style={{ flexDirection: "row", alignItems: "center" }}>
       <Avatar size="medium" rounded source={{ uri: logopath }} containerStyle={{ backgroundColor: "gray" }} />
         <Text style={{ fontSize: 17, marginLeft: 15, fontWeight: 'bold' }}>{name}</Text>
       </View>
-
+     
       {
         status !== "PROGRESSING" ?
           <>
@@ -49,6 +45,7 @@ const MatchingRequestItem = (props) => {
           :
           <></>
       }
+     
     </TouchableOpacity>
   );
 };

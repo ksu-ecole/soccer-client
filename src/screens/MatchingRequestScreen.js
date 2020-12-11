@@ -17,9 +17,9 @@ async function getRequest(setRequest, id) {
         Authorization: token
       }
     }
-
     const res = await api.get(`/api/matches/home/${id}`, config);
     setRequest(res.data);
+    console.log("ㅎㅇㅎㅇㅎㅇㅎㅇ")
   } catch (error) {
     console.log(error)
   }
@@ -27,7 +27,7 @@ async function getRequest(setRequest, id) {
 
 const MatchingRequestScreen = ({ route }) => {
   const { id } = route.params;
-  const [request, setRequest] = useState(null);
+  const [ request , setRequest] = useState(null);
 
   useEffect(() => {
     getRequest(setRequest, id);
@@ -37,19 +37,19 @@ const MatchingRequestScreen = ({ route }) => {
     <>
       {
         request ?
-          <>
-            {
-              <View style={{ flex: 1, padding: 10 }}>
-                <FlatList
-                  data={request.applicationTeamResponses}
-                  keyExtractor={(item) => item.id.toString()}
-                  renderItem={({ item }) => <MatchingRequestItem matchingRequest={item} />}
-                  style={{ margin: 10 }}
-                />
-              </View>
-            }
-          </>
-          : <Text>Loading...</Text>
+        <>
+          {
+            <View style={{ flex: 1, padding: 10 }}>
+            <FlatList
+              data={request.applicationTeamResponses}
+              keyExtractor={(item) => item.id.toString()}
+              renderItem={({ item }) => <MatchingRequestItem matchingRequest={item} />}
+              style={{ margin: 10 }}
+            />
+            </View>
+          }
+        </>
+        : <Text>Loading...</Text>
       }
     </>
 

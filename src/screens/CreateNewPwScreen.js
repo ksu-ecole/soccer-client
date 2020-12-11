@@ -37,7 +37,7 @@ async function ChangePW(data, navigation) {
 
     await api.put("/api/accounts/password", data, config),
       console.log("비밀번호 변경 성공"),
-      navigation.navigate('EditMyInformation')
+      navigation.navigate('MyPage')
   } catch (err) {
     console.log("비밀번호 변경 실패");
     console.log(err);
