@@ -18,7 +18,9 @@ async function getProfile(setAccount) {
     }
     const res = await api.get('/api/accounts/profile', config);
     setAccount(res.data);
-    //console.log(res.data)
+    console.log("account.id")
+    //어딜가나 35
+    console.log(res.data)
   } catch (err) {
     console.log(err);
   }
@@ -34,7 +36,10 @@ async function getMyBoard(setMy) {
     }
     const res = await api.get(`/api/boards/myBoard`, config);
     setMy(res.data);
-    console.log(res.data)
+    // console.log("my[0].writerId----------")
+    //어딜가나 35
+
+    // console.log(res.data)
   } catch (error) {
     console.log(error)
   }
@@ -51,6 +56,7 @@ async function getBoardDetail(setBoards, id) {
     }
     const res = await api.get(`/api/boards/${id}`, config);
     setBoards(res.data);
+    // console.log("boards.writerId///boards.name")
     // console.log(res.data)
   } catch (error) {
     console.log(error)
@@ -125,9 +131,10 @@ const BoardDetailScreen = ({ route, navigation }) => {
       <View style={{ flex: 1, padding: 1 }}>
 
         {
-          my ?
+          boards ?
           account ?
-            my[0].writeid==account.id
+            // my[0].writerId==account.id
+            boards.writeId==account.id
             ? 
               <>
                 {/* 게시글; 프로필사진 avatar + 이름 title + 시간 subtitle */}

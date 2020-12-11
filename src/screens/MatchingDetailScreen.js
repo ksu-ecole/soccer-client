@@ -283,7 +283,7 @@ const MatchingDetailScreen = ({ route, navigation }) => {
               
                 <Button
                 onPress={requestButtonAlert}
-                title="누르지마 신청"
+                title="신청"
                 />
                 
                 <Button
