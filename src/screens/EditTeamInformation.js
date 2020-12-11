@@ -67,29 +67,7 @@ const EditTeamInformation = ({ route, navigation }) => {
     }
   };
 
-  const createThreeButtonAlert = (navigation) =>
-  Alert.alert(
-    "팀 해체",
-    "팀을 정말 해체하시겠습니까",
-    [
-      {
-        text: "취소",
-        onPress: () => console.log("Cancel Pressed"),
-
-
-        style: "cancel"
-      },
-      {
-        text: "확인",
-        onPress: () => {
-          console.log("Team Delete"),
-          navigation.navigate('MyPage')
-        },
-      }
-    ],
-    { cancelable: false }
-  );
-
+  
   return (
     <ScrollView>
       <View >
@@ -132,7 +110,7 @@ const EditTeamInformation = ({ route, navigation }) => {
           title="저장하기"
         />
         <Text></Text>
-        <Button title={"팀 해체"} onPress={() => createThreeButtonAlert(navigation)} />
+  
 
       </View>
 

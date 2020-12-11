@@ -4,7 +4,7 @@ import {
   TeamDetailScreen,
   TeamCreateScreen,
   TeamListScreen,
-  TeamMemberScreen,
+ 
 } from "../";
 
 const TeamStack = createStackNavigator();
@@ -14,7 +14,7 @@ export default MypageStackScreen = () => {
     <TeamStack.Navigator>
       <TeamStack.Screen name="TeamList" component={TeamListScreen} />
       <TeamStack.Screen name="TeamDetail" component={TeamDetailScreen} />
-      <TeamStack.Screen name="TeamMember" component={TeamMemberScreen} />
+      
       <TeamStack.Screen name="TeamCreate" component={TeamCreateScreen} />
     </TeamStack.Navigator>
   );
