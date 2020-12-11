@@ -75,7 +75,7 @@ console.log(account)
 
                   current={moment().format('YYYY-MM-DD')}
                   minDate={moment().format('YYYY-MM-DD')}
-                  maxDate={'2020-11-30'}
+                  maxDate={'2022-11-30'}
                   onDayPress={(day) => {
                     setDate(day.dateString);
                     setShowCal(false);
