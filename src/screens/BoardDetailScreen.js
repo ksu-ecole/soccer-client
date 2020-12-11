@@ -6,6 +6,42 @@ import CommentsItem from '../components/CommentsItem'
 import { api } from '../api';
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
+async function getProfile(setAccount) {
+  try {
+    const token = await AsyncStorage.getItem('token');
+    const config = {
+      headers: {
+        Authorization: token
+      }
+    }
+    const res = await api.get('/api/accounts/profile', config);
+    setAccount(res.data);
+    // console.log("account.id//account.name")
+    //어딜가나 35
+    // console.log(res.data)
+  } catch (err) {
+    console.log(err);
+  }
+}
+
+async function getMyBoard(setMy) {
+  try {
+    const token = await AsyncStorage.getItem("token");
+    const config = {
+      headers: {
+        Authorization: token
+      }
+    }
+    const res = await api.get(`/api/boards/myBoard`, config);
+    setMy(res.data);
+    // console.log("my[0].writerId")
+    //console.log(res.data)
+  } catch (error) {
+    console.log(error)
+  }
+}
+
+
 async function getBoardDetail(setBoards, id) {
   try {
     const token = await AsyncStorage.getItem("token");
@@ -16,6 +52,7 @@ async function getBoardDetail(setBoards, id) {
     }
     const res = await api.get(`/api/boards/${id}`, config);
     setBoards(res.data);
+    console.log(res.data)
   } catch (error) {
     console.log(error)
   }
@@ -31,7 +68,7 @@ async function postComment(data, setContent) {
     }
     const res = await api.post(`/api/comments`, data, config);
     setContent('');
-    console.log(res);
+    // console.log(res);
   } catch (error) {
     console.log(error)
   }
@@ -39,13 +76,33 @@ async function postComment(data, setContent) {
 
 const BoardDetailScreen = ({ route, navigation }) => {
   const {id} = route.params;
+  const myid = 0;
   // const {id, title, content} = route.board;
   const [boards, setBoards] = useState('');
   const [content, setContent] = useState('');
+  const [account, setAccount] = useState(null);
+  const [my, setMy] = useState(null);
 
   useEffect(() => {
     getBoardDetail(setBoards, id);
   }, [boards])
+
+  useEffect(() => {
+    getProfile(setAccount);
+  }, [])
+  
+  useEffect(() => {
+    getMyBoard(setMy);
+  }, [])
+
+  //console.log(my[0].id)
+  // my.map((item, i) => (
+  //   account.id==item[i].id
+  //   ? {myid}=myid+1
+
+  //   : <></>
+  // ))
+  // console.log(myid)
 
   const deleteButtonAlert = () =>
     Alert.alert(
@@ -67,74 +124,147 @@ const BoardDetailScreen = ({ route, navigation }) => {
   return (
     <>
       <View style={{ flex: 1, padding: 1 }}>
-        {/* 게시글; 프로필사진 avatar + 이름 title + 시간 subtitle */}
-        <View style={styles.writer} >
-          <ListItem bottomDivider>
-            <Avatar rounded source={{ uri: boards.image }} />
-            <ListItem.Content>
-              <ListItem.Title>{boards.name}</ListItem.Title>
-              <ListItem.Subtitle>{boards.createdAt}</ListItem.Subtitle>
-            </ListItem.Content>
 
-            <View style={styles.udbutton} >
-              <Button
-                title="수정"
-                type="outline"
-                onPress={() => {navigation.navigate('BoardModify', {id: id, title: boards.title, content: boards.content}); 
-                  console.log()}}
-              />
-              <Text>   </Text>
-              <Button
-                onPress={deleteButtonAlert}
-                title="삭제"
-                type="outline"
-              />
-            </View>
-          </ListItem>
-        </View>
+        {
+          boards ?
+          account ?
+            // my[0].writerId==account.id
+            boards.writerId==account.id
+            ? 
+              <>
+                {/* 게시글; 프로필사진 avatar + 이름 title + 시간 subtitle */}
+                <View style={styles.writer} >
+                  <ListItem bottomDivider>
+                    <Avatar rounded source={{ uri: boards.image }} />
+                    <ListItem.Content>
+                      <ListItem.Title>{boards.name}</ListItem.Title>
+                      <ListItem.Subtitle>{boards.createdAt}</ListItem.Subtitle>
+                    </ListItem.Content>
 
-        {/* 게시글; 제목 + 내용 */}
-        <View style={styles.content}>
-          <Text style={styles.title}>
-            {boards.title}
-          </Text>
-          <Text>
-            {boards.content}
-          </Text>
-        </View>
+                    
+                    <View style={styles.udbutton} >
+                      <Button
+                        title="수정"
+                        type="outline"
+                        onPress={() => {navigation.navigate('BoardModify', {id: id, title: boards.title, content: boards.content}); 
+                          console.log()}}
+                      />
+                      <Text>   </Text>
+                      <Button
+                        onPress={deleteButtonAlert}
+                        title="삭제"
+                        type="outline"
+                      />
+                    </View>
+                  </ListItem>
+                </View>
 
-        {/* 댓글 입력창 */}
-        <View style={styles.inputComment}>
-          <TextInput
-            onChangeText={setContent}
-            value={content}
-            style={styles.inputCommentTextbox}
-            multiline={true}
-            placeholderTextColor="grey"
-            placeholder="댓글을 입력하세요."
-          />
-          <Button title="완료" color="gray" onPress={() => {
-            const data = {
-              boardId: id,
-              content: content
-            }
-            postComment(data, setContent);
-          }}>
-          </Button>
-        </View>
+                {/* 게시글; 제목 + 내용 */}
+                <View style={styles.content}>
+                  <Text style={styles.title}>
+                    {boards.title}
+                  </Text>
+                  <Text>
+                    {boards.content}
+                  </Text>
+                </View>
+
+                {/* 댓글 입력창 */}
+                <View style={styles.inputComment}>
+                  <TextInput
+                    onChangeText={setContent}
+                    value={content}
+                    style={styles.inputCommentTextbox}
+                    multiline={true}
+                    placeholderTextColor="grey"
+                    placeholder="댓글을 입력하세요."
+                  />
+                  <Button title="완료" color="gray" onPress={() => {
+                    const data = {
+                      boardId: id,
+                      content: content
+                    }
+                    postComment(data, setContent);
+                  }}>
+                  </Button>
+                </View>
 
 
-        {/* 프로필사진 avatar + 이름 title + 시간 subtitle */}
-        <View style={{ flex: 1, margin: 10 }}>
-          <FlatList
-            data={boards.comments}
-            keyExtractor={(item) => item.id.toString()} // comment의 id 값 주긴
-            renderItem={({ item }) => <CommentsItem comment={item} navigation={navigation} />}
-            style={{ backgroundColor: 'white' }}
-          />
-        </View>
+                {/* 프로필사진 avatar + 이름 title + 시간 subtitle */}
+                <View style={{ flex: 1, margin: 10 }}>
+                  <FlatList
+                    data={boards.comments}
+                    keyExtractor={(item) => item.id.toString()} // comment의 id 값 주긴
+                    renderItem={({ item }) => <CommentsItem comment={item} navigation={navigation} />}
+                    style={{ backgroundColor: 'white' }}
+                  />
+                </View>
+
+              
+              </>
+            :
+              <>
+                {/* 게시글; 프로필사진 avatar + 이름 title + 시간 subtitle */}
+                <View style={styles.writer} >
+                  <ListItem bottomDivider>
+                    <Avatar rounded source={{ uri: boards.image }} />
+                    <ListItem.Content>
+                      <ListItem.Title>{boards.name}</ListItem.Title>
+                      <ListItem.Subtitle>{boards.createdAt}</ListItem.Subtitle>
+                    </ListItem.Content>
+
+                    
+                  </ListItem>
+                </View>
+
+                {/* 게시글; 제목 + 내용 */}
+                <View style={styles.content}>
+                  <Text style={styles.title}>
+                    {boards.title}
+                  </Text>
+                  <Text>
+                    {boards.content}
+                  </Text>
+                </View>
+
+                {/* 댓글 입력창 */}
+                <View style={styles.inputComment}>
+                  <TextInput
+                    onChangeText={setContent}
+                    value={content}
+                    style={styles.inputCommentTextbox}
+                    multiline={true}
+                    placeholderTextColor="grey"
+                    placeholder="댓글을 입력하세요."
+                  />
+                  <Button title="완료" color="gray" onPress={() => {
+                    const data = {
+                      boardId: id,
+                      content: content
+                    }
+                    postComment(data, setContent);
+                  }}>
+                  </Button>
+                </View>
+
+
+                {/* 프로필사진 avatar + 이름 title + 시간 subtitle */}
+                <View style={{ flex: 1, margin: 10 }}>
+                  <FlatList
+                    data={boards.comments}
+                    keyExtractor={(item) => item.id.toString()} // comment의 id 값 주긴
+                    renderItem={({ item }) => <CommentsItem comment={item} navigation={navigation} />}
+                    style={{ backgroundColor: 'white' }}
+                  />
+                </View>
+              </>
+          : <></>
+          : <></>
+        }
+
 
       </View>
+        
     </>
   );
 }
