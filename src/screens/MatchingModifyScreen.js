@@ -57,7 +57,7 @@ const MatchingModifyScreen = ({ route, navigation }) => {
   const [matchingCountMember, setCountMember] = useState(countMember);
   const [matchingDescription, setDescription] = useState(description);
   const [account, setAccount] = useState(null);
-
+console.log(account)
   useEffect(() => {
     getProfile(setAccount);
   }, [])
@@ -66,8 +66,6 @@ const MatchingModifyScreen = ({ route, navigation }) => {
   return (
     <>
       {
-        account ?
-          account.leadingTeam ?
             showCal ?
               <View style={{ flex: 1, flexDirection: "column", justifyContent: "center" }}>
                 <CalendarList
@@ -144,10 +142,6 @@ const MatchingModifyScreen = ({ route, navigation }) => {
                   </View>
                 </View>
               </ScrollView>
-              :
-              <Text>팀장만 수정할 수 있습니다.</Text>
-            :
-            <ActivityIndicator />
       }
     </>
   )
