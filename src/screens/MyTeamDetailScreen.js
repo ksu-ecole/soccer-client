@@ -10,158 +10,261 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useIsFocused } from '@react-navigation/native';
 
 
-// import Icon from 'react-native-vector-icons/FontAwesome';
-
-async function getTeam(setTeam, teamId) {
+async function DeleteTeam(id, navigation) {
   try {
     const token = await AsyncStorage.getItem('token');
     const config = {
       headers: {
-        Authorization: token
+        'Authorization': token,
       }
     }
-    const res = await api.get(`/api/teams/${teamId}`, config);
-    setTeam(res.data);
-    console.log(res.data);
+    const res = await api.delete(`/api/teams/${id}`, config);
+    console.log(res);
+    navigation.navigate('MyPage', {
+      screen: 'MyPage',
 
+    });
   } catch (err) {
-    //console.log(err);
+    console.log(err);
   }
 }
 
+
+async function withdrawal(data, navigation) {
+  try {
+    const token = await AsyncStorage.getItem('token');
+    const config = {
+      headers: {
+        'Authorization': token,
+      }
+    }
+    const res = await api.put(`/api/accounts/withdrawal`, data, config);
+    console.log(res);
+    navigation.navigate('MyPage', {
+      screen: 'MyTeamDetailScreen',
+
+    });
+  } catch (err) {
+    console.log(err);
+  }
+}
+
+
+// import Icon from 'react-native-vector-icons/FontAwesome';
+
+// async function getTeam(setTeam, teamId) {
+//   try {
+//     const token = await AsyncStorage.getItem('token');
+//     const config = {
+//       headers: {
+//         'Authorization': token
+//       }
+//     }
+//     const res = await api.get(`/api/teams/${teamId}`, config);
+//     setTeam(res.data);
+//     console.log(res.data);
+//   } catch (err) {
+//     console.log(err);
+//   }
+// }
+
+async function getProfile(setAccount) {
+  try {
+    const token = await AsyncStorage.getItem('token');
+    const config = {
+      headers: {
+        'Authorization': token
+      }
+    }
+    const res = await api.get('/api/accounts/profile', config);
+    setAccount(res.data);
+    // console.log(res.data);
+  } catch (err) {
+    console.log(err);
+  }
+}
+
+
 const MyTeamDetailScreen = ({ route, navigation }) => {
-  const teamId = route.params.id;
-  const [team, setTeam] = useState(null);
+  //const { id, team } = route.params.params;
+  const teamId = route.params;
+  const [account, setAccount] = useState(null);
   const isFocused = useIsFocused();
+  // useEffect(() => {
+  //   getTeam(setTeam, teamId);
+  // }, [isFocused])
+
   useEffect(() => {
-    getTeam(setTeam, teamId);
+    getProfile(setAccount);
   }, [isFocused])
 
-  const exitButtonAlert = () =>
-    Alert.alert(
-      "팀 탈퇴",
-      `팀을 탈퇴하시겠습니까?`,
-      [
-        {
-          text: "취소",
-          onPress: () => console.log("팀 탈퇴 취소"),
-          style: "cancel"
-        },
-        {
-          text: "확인", onPress: () => {
-
-            console.log("팀 탈퇴 성공")
-            navigation.navigate('MyPage');
-          }
-        }
-      ],
-      { cancelable: false }
-    );
+  // const exitButtonAlert = () =>
+  //   Alert.alert(
+  //     "팀 탈퇴",
+  //     `팀을 탈퇴하시겠습니까?`,
+  //     [
+  //       {
+  //         text: "취소",
+  //         onPress: () => console.log("팀 탈퇴 취소"),
+  //         style: "cancel"
+  //       },
+  //       {
+  //         text: "확인", onPress: () => {
+  //           const data = {
+  //             description: t_description
+  //           };
+  //           console.log("팀 탈퇴 성공")
+  //           navigation.navigate('MyPage');
+  //         }
+  //       }
+  //     ],
+  //     { cancelable: false }
+  //   );
 
   return (
     <>
-      {/* {console.log(route.params)} */}
-      {
-        team ?
+      {console.log(route.params)}
+        {account ?
+          account.team === null ?
+          <View>
+            <Button
+                onPress={() => {
+                  
+                  navigation.navigate('MyPage',
+                    );
+                }}
+
+                title="팀이 없습니다 (돌아 가기)"
+                type="outline"
+
+              />
+
+          </View>
+          :
           <ScrollView style={styles.background}>
             <View style={styles.teamprofile}>
-              <Image source={{ uri: team.logopath }} style={{ width: 100, height: 100, borderRadius: 150 / 2 }} />
+              <Image source={{ uri: account.team.logopath }} style={{ width: 100, height: 100, borderRadius: 150 / 2 }} />
               <View style={{ flexDirection: 'column' }}>
-                <Text styles={styles.teamname} style={{ fontSize: 20 }}>{team.name}</Text>
+                <Text styles={styles.teamname} style={{ fontSize: 20 }}>{account.team.name}</Text>
               </View>
             </View>
 
-            {
-              team.isOwner === false
-                ?
-                <>
-                  <View>
+            <View>
+              {account.owner ?
+                <Button
+                  onPress={() => {
+                    navigation.navigate('EditTeamInformation', {team : account.team })
+                  }}
+                  title="팀 정보 수정"
+                />
+                : <Text></Text>
+              }
+              <View style={{ marginBottom: 30 }}>
+                <ListItem bottomDivider>
+                  <Icon name='room' />
+                  <ListItem.Content>
+                    <ListItem.Title >지역</ListItem.Title>
+                    <ListItem.Subtitle >{account.team.state} {account.team.district}</ListItem.Subtitle>
+                  </ListItem.Content>
+                </ListItem>
+                <ListItem bottomDivider>
+                  <Icon name='info' />
+                  <ListItem.Content>
+                    <ListItem.Title >설명</ListItem.Title>
+                    <ListItem.Subtitle >{account.team.description}</ListItem.Subtitle>
+                  </ListItem.Content>
+                </ListItem>
+              </View>
+            </View>
 
-                    <View style={{ marginBottom: 30 }}>
-                      <ListItem bottomDivider>
-                        <Icon name='room' />
-                        <ListItem.Content>
-                          <ListItem.Title >지역</ListItem.Title>
-                          <ListItem.Subtitle >{team.state} {team.district}</ListItem.Subtitle>
-                        </ListItem.Content>
-                      </ListItem>
-                      <ListItem bottomDivider>
-                        <Icon name='info' />
-                        <ListItem.Content>
-                          <ListItem.Title >설명</ListItem.Title>
-                          <ListItem.Subtitle >{team.description}</ListItem.Subtitle>
-                        </ListItem.Content>
-                      </ListItem>
-                    </View>
-                  </View>
+
+            <View style={{ marginBottom: 30 }}>
+              <Button
+                onPress={() => {
+                  console.log(account.team.id, account.id)
+                  navigation.navigate('TeamMember',
+                    { id: account.team.id, memberId: account.id });
+                }}
+
+                title="팀원 목록"
+                type="outline"
+
+              />
+            </View>
 
 
-                  <View style={{ marginBottom: 30 }}>
-                    <Button
-                      onPress={() => {
-                        navigation.navigate('TeamMember',
-                          { id: teamId });
-                      }}
-                      title="팀원 목록"
-                      type="outline"
-                    />
-                  </View>
-
-                  <View>
-                    <Button
-                      onPress={exitButtonAlert}
-                      title="팀 탈퇴"
-                    />
-                  </View>
-                </>
+            <View>
+              {account.owner ?
+                <Text></Text>
                 :
-                <>
-                  <View>
-                    <Button
-                      onPress={() => {
-                        navigation.navigate('EditTeamInformation', { team: team })
-                      }}
-                      title="팀 정보 수정"
-                    />
+                <Button
+                  onPress={() => {
+                    Alert.alert(
+                      "팀 탈퇴",
+                      `팀을 탈퇴하시겠습니까?`,
+                      [
+                        {
+                          text: "취소",
+                          onPress: () => console.log("팀 탈퇴 취소"),
+                          style: "cancel"
+                        },
+                        {
+                          text: "확인", onPress: () => {
+                            {
+                              
+                              withdrawal( navigation);
 
-                    <View style={{ marginBottom: 30 }}>
-                      <ListItem bottomDivider>
-                        <Icon name='room' />
-                        <ListItem.Content>
-                          <ListItem.Title >지역</ListItem.Title>
-                          <ListItem.Subtitle >{team.state} {team.district}</ListItem.Subtitle>
-                        </ListItem.Content>
-                      </ListItem>
-                      <ListItem bottomDivider>
-                        <Icon name='info' />
-                        <ListItem.Content>
-                          <ListItem.Title >설명</ListItem.Title>
-                          <ListItem.Subtitle >{team.description}</ListItem.Subtitle>
-                        </ListItem.Content>
-                      </ListItem>
-                    </View>
-                  </View>
+                              console.log("팀 탈퇴 성공")
+                              navigation.navigate('MyPage');
+                            }
+                          }
+                        }
+                      ],
+                      { cancelable: false }
+                    );
 
+                  }}
+                  title="팀 탈퇴"
+                />
+              }
 
-                  <View style={{ marginBottom: 30 }}>
-                    <Button
-                      onPress={() => {
-                        navigation.navigate('TeamMember',
-                          { id: teamId });
-                      }}
-                      title="팀원 목록"
-                      type="outline"
-                    />
-                  </View>
+              {account.owner ?
+                <Button
+                  onPress={() => {
+                    Alert.alert(
+                      "팀 해체",
+                      `팀을 해체하시겠습니까?`,
+                      [
+                        {
+                          text: "취소",
+                          onPress: () => console.log("팀 해체 취소"),
+                          style: "cancel"
+                        },
+                        {
+                          text: "확인", onPress: () => {
+                            {
 
-                </>
+                              const id = account.team.id;
+                              console.log(id);
+                              DeleteTeam(id, navigation);
 
-            }
+                              console.log("팀 해체 성공")
+                              navigation.navigate('MyPage');
+                            }
+                          }
+                        }
+                      ],
+                      { cancelable: false }
+                    );
 
+                  }}
+                  title="팀 해체"
+                />
+                :
+                <Text></Text>
 
-
-            {/* <Text>{team.name}</Text>
-            <Image style={styles.image} source={{ uri: team.logopath }} /> */}
+              }
+            </View>
 
           </ScrollView>
           :
