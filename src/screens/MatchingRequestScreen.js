@@ -19,7 +19,7 @@ async function getRequest(setRequest, id) {
     }
     const res = await api.get(`/api/matches/home/${id}`, config);
     setRequest(res.data);
-    console.log("ㅎㅇㅎㅇㅎㅇㅎㅇ")
+    console.log(res.data)
   } catch (error) {
     console.log(error)
   }
