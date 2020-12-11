@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useIsFocused } from '@react-navigation/native';
 import { View, Text, Switch, Button } from 'react-native';
 import { SearchBar } from 'react-native-elements';
 import { FlatList } from 'react-native-gesture-handler';
@@ -23,7 +24,7 @@ async function getMatchingList(setMatchings, search, location) {
       }
     }
     const res = await api.get(`/api/matches?teamName=${search}&state=${location.state}&district=${location.district}`, config);
-    console.log(`/api/matches?teamName=${search}&state=${location.state}&district=${location.district}`)
+    console.log(`/api/matches?teamName=${search}&state=${location.state}&district=${location.district}`)//
     setMatchings(res.data);
   } catch (error) {
     console.log(error)
@@ -45,6 +46,21 @@ async function getmyMatchingList(setmyMatchings) {
   }
 }
 
+async function getProfile(setAccount) {
+  try {
+    const token = await AsyncStorage.getItem('token');
+    const config = {
+      headers: {
+        'Authorization': token
+      }
+    }
+    const res = await api.get('/api/accounts/profile', config);
+    setAccount(res.data);
+  } catch (err) {
+    console.log(err);
+  }
+}
+
 const MatchingListScreen = ({ navigation }) => {
 
   const [search, setSearch] = useState('');
@@ -53,116 +69,131 @@ const MatchingListScreen = ({ navigation }) => {
   const [location, setLocation] = useState();
   const [matchings, setMatchings] = useState([]);
   const [myMatchings, setmyMatchings] = useState([]);
+  const [account, setAccount] = useState(null);
   const [isEnabled, setIsEnabled] = useState(false); //toggle
   const toggleSwitch = () => setIsEnabled(previousState => !previousState); //toggle
-  
+  const isFocused = useIsFocused();
+
   useEffect(() => {
     getMatchingList(setMatchings, search, location);
-  }, [search, location])
+  }, [search, location, isFocused])
 
   useEffect(() => {
     getmyMatchingList(setmyMatchings);
-  })
+  }, [isFocused])
+
+  useEffect(() => {
+    getProfile(setAccount);
+  }, [isFocused])
 
   return (
     <>
-    {
-      showCal ?
-        <Calendar
-          horizontal={true}
-          pagingEnabled={true}
-          futureScrollRange={50}
-          current={moment().format('YYYY-MM-DD')}
-          minDate={moment().format('YYYY-MM-DD')}
-          maxDate={'2020-11-30'}
-          onDayPress={(day) => {
-            setDate(day.dateString);
-            setShowCal(false);
-            console.log('selected day: ', date)
-          }}
-          monthFormat={'yyyy-MM-dd'}
-          hideExtraDays={true}
-          markedDates={{
-            // '2020-11-12': { startingDay: true, startingDay: true, color: 'skyblue'},
-            // '2020-11-13': { endingDay: true, startingDay: true, color: 'skyblue'},
-            [date]: { selected: true, marked: true, selectedColor: 'blue' }
-          }}
-          markingType={'period'}
-        />
-        :
-        isEnabled ?
-          <View style={{ flex: 1, padding: 20 }}>
-            <Switch
-              trackColor={{ false: "#767577", true: "#81b0ff" }}
-              thumbColor={isEnabled ? "#f5dd4b" : "#f4f3f4"}
-              ios_backgroundColor="#3e3e3e"
-              onValueChange={toggleSwitch}
-              value={isEnabled}
-            />
-            <View style={{ alignItems: 'center' }}>
-              <Avatar
-                size="large"
-                // rounded source={{uri: }}
-                containerStyle={{ backgroundColor: "gray" }}
-              />
-              <Text style={{ fontSize: 30 }}> 우리팀 이름 </Text>
-            </View>
-            {myMatchings.owner ?
-              // 팀장이면
-              <FlatList
-              data={myMatchings.matches}
-              keyExtractor={(item) => item.id.toString()}
-              renderItem={({ item }) => <MyMatchingItem myMatching={item} navigation={navigation} />}
-              style={{ margin: 10 }}
-             />              
-             :
-             // 팀원이면
-             <FlatList
-             data={myMatchings.matches}
-             keyExtractor={(item) => item.id.toString()}
-             renderItem={({ item }) => <NoMyMatchingItem NoMyMatching={item} navigation={navigation} />}
-             style={{ margin: 10 }}
-            />         
-            }
-          </View>
+      {
+        showCal ?
+          <Calendar
+            horizontal={true}
+            pagingEnabled={true}
+            futureScrollRange={50}
+            current={moment().format('YYYY-MM-DD')}
+            minDate={moment().format('YYYY-MM-DD')}
+            maxDate={'2020-11-30'}
+            onDayPress={(day) => {
+              setDate(day.dateString);
+              setShowCal(false);
+              console.log('selected day: ', date)
+            }}
+            monthFormat={'yyyy-MM-dd'}
+            hideExtraDays={true}
+            markedDates={{
+              // '2020-11-12': { startingDay: true, startingDay: true, color: 'skyblue'},
+              // '2020-11-13': { endingDay: true, startingDay: true, color: 'skyblue'},
+              [date]: { selected: true, marked: true, selectedColor: 'blue' }
+            }}
+            markingType={'period'}
+          />
           :
-          <View style={{ flex: 1, padding: 20 }}>
-            <Switch
-              trackColor={{ false: "#767577", true: "#81b0ff" }}
-              thumbColor={isEnabled ? "#f5dd4b" : "#f4f3f4"}
-              ios_backgroundColor="#3e3e3e"
-              onValueChange={toggleSwitch}
-              value={isEnabled}
-            />
-            <SearchBar
-              placeholder="Team Seach"
-              onChangeText={setSearch}
-              value={search}
-              onSubmitEditing={() => console.log('search:' + search)}
-              containerStyle={{ backgroundColor: '#DCDCDC' }}
-              lightTheme round
-              style={{ margin: 5 }}
-            />
-            <View style={{ flexDirection: "row", alignItems: 'center' }}>
-              <AllLocationItem setLocation={setLocation} />
+          isEnabled ?
+            <View style={{ flex: 1, padding: 20 }}>
+              <Switch
+                trackColor={{ false: "#767577", true: "#81b0ff" }}
+                thumbColor={isEnabled ? "#f5dd4b" : "#f4f3f4"}
+                ios_backgroundColor="#3e3e3e"
+                onValueChange={toggleSwitch}
+                value={isEnabled}
+              />
+              <View style={{ alignItems: 'center' }}>
+              
+                {myMatchings?
+                  <>
+                    <Avatar
+                      size="large"
+                      rounded source={{uri: `${account.team.logopath}` }}
+                      containerStyle={{ backgroundColor: "gray" }}
+                    />
+                    <Text style={{ fontSize: 30 }}> 
+                      {account.team.name} 
+                    </Text>
+                  </>
+                  :
+                  <Text>Loading...</Text>
+                }
+              </View>
+              {myMatchings.owner ?
+                // 팀장이면
+                <FlatList
+                  data={myMatchings.matches}
+                  keyExtractor={(item) => item.id.toString()}
+                  renderItem={({ item }) => <MyMatchingItem myMatching={item} navigation={navigation} />}
+                  style={{ margin: 10 }}
+                />
+                :
+                // 팀원이면
+                <FlatList
+                  data={myMatchings.matches}
+                  keyExtractor={(item) => item.id.toString()}
+                  renderItem={({ item }) => <NoMyMatchingItem NoMyMatching={item} navigation={navigation} />}
+                  style={{ margin: 10 }}
+                />
+              }
             </View>
-            <Button
-              title="날짜선택"
-              onPress={() => setShowCal(true)}
-              color="gray"
-            />
-            <FlatList
-              data={matchings}
-              keyExtractor={(item) => item.id.toString()}
-              renderItem={({ item }) => <MatchingItem matching={item} navigation={navigation} />}
-            />
-            <Button
-              title="경기개설"
-              onPress={() => navigation.navigate('MatchingCreate')}
-            />
-          </View>
+            :
+            <View style={{ flex: 1, padding: 20 }}>
+              <Switch
+                trackColor={{ false: "#767577", true: "#81b0ff" }}
+                thumbColor={isEnabled ? "#f5dd4b" : "#f4f3f4"}
+                ios_backgroundColor="#3e3e3e"
+                onValueChange={toggleSwitch}
+                value={isEnabled}
+              />
+              <SearchBar
+                placeholder="Team Seach"
+                onChangeText={setSearch}
+                value={search}
+                onSubmitEditing={() => console.log('search:' + search)}
+                containerStyle={{ backgroundColor: '#DCDCDC' }}
+                lightTheme round
+                style={{ margin: 5 }}
+              />
+              <View style={{ flexDirection: "row", alignItems: 'center' }}>
+                <AllLocationItem setLocation={setLocation} />
+              </View>
+              <Button
+                title="날짜선택"
+                onPress={() => setShowCal(true)}
+                color="gray"
+              />
+              <FlatList
+                data={matchings}
+                keyExtractor={(item) => item.id.toString()}
+                renderItem={({ item }) => <MatchingItem matching={item} navigation={navigation} />}
+              />
+              <Button
+                title="경기개설"
+                onPress={() => navigation.navigate('MatchingCreate')}
+              />
+            </View>
 
-    }
+      }
 
 
     </>
