@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import { TouchableOpacity, Text, View, Button, Alert } from 'react-native';
+import React from 'react';
+import { TouchableOpacity, Text, View, Button } from 'react-native';
 import { Avatar } from 'react-native-elements';
 import { api } from '../api';
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -8,10 +8,10 @@ const MatchingRequestItem = (props) => {
   const matchId = props.matchingRequest.match.id;
   const name = props.matchingRequest.applyTeam.name;
   const logopath = props.matchingRequest.applyTeam.logopath;
-  const applyTeamId = props.matchingRequest.applyTeam.id;
+  const applyTeamId = props.matchingRequest.id;
   const status = props.matchingRequest.match.matchStatus;
   
-  async function putRequest(setMatch, homeStatus, matchId, applyTeamId) {
+  async function putRequest(homeStatus, matchId, applyTeamId) {
     try {
       const token = await AsyncStorage.getItem("token");
       const config = {
