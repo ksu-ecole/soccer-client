@@ -24,7 +24,7 @@ async function putTeam(id, data, logopath, navigation) {
         'Content-Type': 'multipart/form-data'
       }
     }
-    const res = await api.put(`/api/teams/${id}`, formData, config);
+    const res = await api.put(`/api/teams/${id}`, data, formData, config);
     console.log(res);
     navigation.navigate('MyTeamDetailScreen', {
       screen: 'EditTeamInformation',
